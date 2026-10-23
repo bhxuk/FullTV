@@ -61,7 +61,7 @@ internal static class AndroidRuntime
         if (!File.Exists(script)) throw new FileNotFoundException("Android TV setup script not found in application package.", script);
         if (MessageBox.Show("Download Google's Android tools and an Android TV image? SDK licence acceptance may be required. Installation can use several gigabytes.", "Install Android TV", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
         var start = new ProcessStartInfo("powershell.exe") { UseShellExecute = true };
-        foreach (var arg in new[] { "-NoProfile", "-NoExit", "-File", script }) start.ArgumentList.Add(arg);
+        foreach (var arg in new[] { "-NoProfile", "-ExecutionPolicy", "Bypass", "-NoExit", "-File", script }) start.ArgumentList.Add(arg);
         Process.Start(start);
     }
 }
