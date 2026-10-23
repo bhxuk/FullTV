@@ -32,6 +32,8 @@ if (-not (Test-Path $manager)) {
 $env:ANDROID_HOME = $SdkRoot
 $env:ANDROID_SDK_ROOT = $SdkRoot
 $env:ANDROID_AVD_HOME = $avdHome
+$env:ANDROID_USER_HOME = (Join-Path $env:LOCALAPPDATA 'FullTV\\AndroidUser')
+New-Item -ItemType Directory -Path $env:ANDROID_USER_HOME -Force | Out-Null
 Step 'Downloading Android Emulator, platform-tools, and Android TV image. SDK licence prompts may appear.'
 & $manager "--sdk_root=$SdkRoot" 'platform-tools' 'emulator' $ImagePackage
 if ($LASTEXITCODE -ne 0) { throw 'SDK package installation failed. Check Android SDK licence acceptance and the requested system image availability.' }
