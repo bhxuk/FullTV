@@ -41,7 +41,7 @@ internal sealed class TvForm : Form
         ForeColor = Color.White;
         KeyPreview = true;
         DoubleBuffered = true;
-        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FullTV", "0.1.0"));
+        http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FullTV", Application.ProductVersion.Split('+')[0]));
         Directory.CreateDirectory(settingsDir);
         LoadPreferences();
         BuildUi();
@@ -77,7 +77,7 @@ internal sealed class TvForm : Form
         header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 65));
         header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35));
         header.Controls.Add(new Label { Text = "◈  FullTV", Font = new Font("Segoe UI", 22, FontStyle.Bold), AutoSize = true, ForeColor = Color.White }, 0, 0);
-        var version = new LinkLabel { Text = "v0.1.0  ·  GitHub", LinkColor = Color.FromArgb(184, 187, 215), TextAlign = ContentAlignment.MiddleRight, Dock = DockStyle.Fill };
+        var version = new LinkLabel { Text = $"v{Application.ProductVersion.Split('+')[0]}  ·  GitHub", LinkColor = Color.FromArgb(184, 187, 215), TextAlign = ContentAlignment.MiddleRight, Dock = DockStyle.Fill };
         version.Click += (_, _) => Open(Repo);
         header.Controls.Add(version, 1, 0);
         root.Controls.Add(header, 0, 0);
@@ -99,6 +99,7 @@ internal sealed class TvForm : Form
         nav.Controls.Add(Button("◉ Connect ADB", async (_, _) => await ConnectAsync()));
         nav.Controls.Add(Button("⬇ Check updates", async (_, _) => await UpdateAsync()));
         nav.Controls.Add(Button("⚙ Preferences", (_, _) => Preferences()));
+        nav.Controls.Add(Button("◈ Diagnostics", async (_, _) => await SystemDiagnostics.ShowAsync(this, adbPath)));
         nav.Controls.Add(Button("▶ Plex", (_, _) => Open("https://app.plex.tv/desktop/")));
         root.Controls.Add(nav, 0, 2);
 
@@ -236,7 +237,7 @@ internal sealed class TvForm : Form
             using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
             var tag = root.GetProperty("tag_name").GetString() ?? "";
-            var current = new Version(0, 1, 0);
+            var current = Version.TryParse(Application.ProductVersion.Split('+')[0], out var installedVersion) ? installedVersion : new Version(0, 1, 0);
             if (!Version.TryParse(tag.TrimStart('v','V'), out var latest) || latest <= current)
             { MessageBox.Show($"Installed: v{current}\nLatest release: {tag}\nNo newer update detected.", "FullTV updates"); status.Text = "Up to date."; return; }
             var assets = root.GetProperty("assets").EnumerateArray().ToArray();
