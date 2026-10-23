@@ -10,7 +10,7 @@
 
 **FullTV** is a Windows TV-style desktop and Android device management project.
 
-> **Current state: v0.1.0 development preview.** The app does **not** yet bundle or boot Android. It can manage compatible Android apps over ADB after you install Android platform-tools and connect a device or emulator. APK support, Plex, 4K, controller focus navigation and a self-contained Android runtime require further development and validation.
+> **Current state: v0.1.0 development preview.** The app does **not** yet bundle or boot Android. It has an experimental Android TV first-run setup option powered by Google's official Android SDK; this downloads SDK tools and an Android TV system image, creates a virtual device, and opens the Android emulator. It may require a JDK, accepting SDK licences, hardware virtualisation, and substantial disk space. This path has not yet been end-to-end verified on Windows. Android is not bundled in the installer. APK support, Plex, 4K, controller focus navigation and a self-contained Android runtime require further development and validation.
 
 ## What works in the current source
 - Modern dark, responsive Windows desktop home and clickable app tiles
@@ -29,7 +29,7 @@ dotnet restore src/FullTV/FullTV.csproj
 dotnet run --project src/FullTV/FullTV.csproj
 ```
 
-For APK management, install Android SDK platform-tools and add `adb` to PATH, or set its path under Preferences. Enable debugging on an Android device or run a compatible emulator, authorise ADB, then choose **Connect ADB**.
+For APK management, open Android TV and choose **Install and launch Android TV (official SDK)**. FullTV will attempt to provision the Android Emulator and platform-tools and detect its ADB executable on the next application launch. SDK provisioning may fail depending on system image availability and host prerequisites. Alternatively, configure ADB under Preferences. Enable debugging on an Android device or run a compatible emulator, authorise ADB, then choose **Connect ADB**.
 
 ## System requirements
 Windows 10/11 x64, .NET 8 runtime for development (public builds self-contained). An accessible Android device/emulator and ADB are required for app management. Hardware virtualisation and Android guest packaging remain planned features.
