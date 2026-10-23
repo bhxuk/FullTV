@@ -1,5 +1,10 @@
 # FullTV
 
+🌐 **Official website:** **[FullTV — Visit the landing page](https://bhxuk.github.io/FullTV/)**
+
+[![Website](https://img.shields.io/badge/Website-Open%20FullTV-8c8bff?style=for-the-badge)](https://bhxuk.github.io/FullTV/)
+
+
 **FullTV** is a Windows TV-style desktop and Android device management project.
 
 > **Current state: v0.1.0 development preview.** The app does **not** yet bundle or boot Android. It can manage compatible Android apps over ADB after you install Android platform-tools and connect a device or emulator. APK support, Plex, 4K, controller focus navigation and a self-contained Android runtime require further development and validation.
