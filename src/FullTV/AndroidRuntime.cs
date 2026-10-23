@@ -24,6 +24,9 @@ internal static class AndroidRuntime
         var state = new Label { AutoSize=false, Size=new System.Drawing.Size(590,50), Text=IsRunning?"Android running":IsConfigured?"Android disk configured":"Android disk not configured" };
         panel.Controls.Add(state);
         Button Make(string title, Action callback) { var b=new Button { Text=title, Width=360, Height=38, BackColor=System.Drawing.Color.FromArgb(55,59,94), ForeColor=System.Drawing.Color.White, FlatStyle=FlatStyle.Flat };b.Click+=(_,_)=>callback();panel.Controls.Add(b);return b; }
+        Make("Find Android TV ISO (LineageOS TV x86)",()=>{
+            Process.Start(new ProcessStartInfo("https://github.com/LineageOS-TV-x86/x86_64_tv/releases") { UseShellExecute=true });
+        });
         Make("1. Select qemu-system-x86_64.exe",()=>{
             using var fd=new OpenFileDialog { Title="Select QEMU executable",Filter="QEMU executable (*.exe)|*.exe" };
             if(fd.ShowDialog(dialog)==DialogResult.OK) { File.WriteAllText(Config,fd.FileName);state.Text="QEMU configured. Select Android disk."; }
