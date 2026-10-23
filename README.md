@@ -3,6 +3,9 @@
 🌐 **Official website:** **[FullTV — Visit the landing page](https://bhxuk.github.io/FullTV/)**
 
 [![Website](https://img.shields.io/badge/Website-Open%20FullTV-8c8bff?style=for-the-badge)](https://bhxuk.github.io/FullTV/)
+[![Download latest Windows EXE](https://img.shields.io/badge/Download-Latest%20Windows%20EXE-40c8a0?style=for-the-badge)](https://github.com/bhxuk/FullTV/releases/latest/download/FullTV-Setup.exe)
+
+**⬇ [Download the latest FullTV Windows installer (.exe)](https://github.com/bhxuk/FullTV/releases/latest/download/FullTV-Setup.exe)**
 
 
 **FullTV** is a Windows TV-style desktop and Android device management project.
