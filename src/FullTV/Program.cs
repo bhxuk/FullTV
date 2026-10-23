@@ -30,6 +30,8 @@ internal sealed class TvForm : Form
     private string adbPath = "adb";
     private Color accent = Color.FromArgb(121, 116, 248);
     private bool connected;
+    private bool tvFullscreen;
+    private readonly List<Button> focusable = new();
 
     public TvForm()
     {
@@ -45,6 +47,7 @@ internal sealed class TvForm : Form
         Directory.CreateDirectory(settingsDir);
         LoadPreferences();
         BuildUi();
+        KeyDown += HandleTvKeys;
         Shown += async (_, _) => await RefreshAppsAsync();
     }
 
@@ -60,12 +63,14 @@ internal sealed class TvForm : Form
         };
         b.FlatAppearance.BorderSize = 0;
         b.Click += action;
+        focusable.Add(b);
         return b;
     }
 
     private void BuildUi()
     {
         Controls.Clear();
+        focusable.Clear();
         var root = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 4, Padding = new Padding(42, 30, 42, 24) };
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 64));
         root.RowStyles.Add(new RowStyle(SizeType.Absolute, 190));
@@ -101,6 +106,7 @@ internal sealed class TvForm : Form
         nav.Controls.Add(Button("⚙ Preferences", (_, _) => Preferences()));
         nav.Controls.Add(Button("◈ Diagnostics", async (_, _) => await SystemDiagnostics.ShowAsync(this, adbPath)));
         nav.Controls.Add(Button("▶ Plex", (_, _) => Open("https://app.plex.tv/desktop/")));
+        nav.Controls.Add(Button("⛶ Fullscreen", (_, _) => ToggleFullscreen()));
         root.Controls.Add(nav, 0, 2);
 
         var bottom = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3 };
@@ -258,6 +264,41 @@ internal sealed class TvForm : Form
             Close();
         }
         catch (Exception ex) { status.Text = "Update check unavailable."; MessageBox.Show(ex.Message, "Update"); }
+    }
+
+    private void ToggleFullscreen()
+    {
+        tvFullscreen = !tvFullscreen;
+        if (tvFullscreen)
+        {
+            FormBorderStyle = FormBorderStyle.None;
+            WindowState = FormWindowState.Maximized;
+            TopMost = true;
+        }
+        else
+        {
+            TopMost = false;
+            WindowState = FormWindowState.Normal;
+            FormBorderStyle = FormBorderStyle.Sizable;
+        }
+        status.Text = tvFullscreen ? "TV fullscreen mode · Esc to exit · Arrow keys to navigate · Enter to select" : "Windowed mode";
+    }
+
+    // Keyboard navigation also works with gamepads that map their D-pad to arrow keys.
+    // Direct XInput controller support remains separate and is not claimed here.
+    private void HandleTvKeys(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.F11) { ToggleFullscreen(); e.Handled = true; return; }
+        if (e.KeyCode == Keys.Escape && tvFullscreen) { ToggleFullscreen(); e.Handled = true; return; }
+        if (e.KeyCode != Keys.Left && e.KeyCode != Keys.Right && e.KeyCode != Keys.Up && e.KeyCode != Keys.Down) return;
+        var buttons = focusable.Where(b => !b.IsDisposed && b.Visible && b.Enabled && b.CanFocus).ToList();
+        if (buttons.Count == 0) return;
+        var selected = buttons.FindIndex(b => b.Focused);
+        var step = e.KeyCode is Keys.Left or Keys.Up ? -1 : 1;
+        var next = (selected + step + buttons.Count) % buttons.Count;
+        buttons[next].Focus();
+        e.Handled = true;
+        e.SuppressKeyPress = true;
     }
 
     private void Preferences()
