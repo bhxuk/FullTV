@@ -53,7 +53,7 @@ internal sealed class TvForm : Form
         KeyDown += HandleTvKeys;
         gamepad = new GamepadNavigation(HandleControllerKey);
         FormClosed += (_, _) => gamepad.Dispose();
-        Shown += async (_, _) => await RefreshAppsAsync();
+        Shown += async (_, _) => { if (AndroidRuntime.IsInstalled) AndroidRuntime.TryStartInstalled(out _); await RefreshAppsAsync(); };
     }
 
     private Button Button(string label, EventHandler action, bool highlight = false)
