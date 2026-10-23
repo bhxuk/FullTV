@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Management;
 using System.Windows.Forms;
 
 namespace FullTV;
