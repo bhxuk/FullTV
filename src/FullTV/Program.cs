@@ -31,6 +31,7 @@ internal sealed class TvForm : Form
     private Color accent = Color.FromArgb(121, 116, 248);
     private bool connected;
     private bool tvFullscreen;
+    private readonly GamepadNavigation gamepad;
     private readonly List<Button> focusable = new();
 
     public TvForm()
@@ -48,6 +49,8 @@ internal sealed class TvForm : Form
         LoadPreferences();
         BuildUi();
         KeyDown += HandleTvKeys;
+        gamepad = new GamepadNavigation(HandleControllerKey);
+        FormClosed += (_, _) => gamepad.Dispose();
         Shown += async (_, _) => await RefreshAppsAsync();
     }
 
@@ -286,6 +289,12 @@ internal sealed class TvForm : Form
 
     // Keyboard navigation also works with gamepads that map their D-pad to arrow keys.
     // Direct XInput controller support remains separate and is not claimed here.
+    private void HandleControllerKey(Keys key)
+    {
+        if (key == Keys.Enter) { if (ActiveControl is Button btn) btn.PerformClick(); return; }
+        HandleTvKeys(this, new KeyEventArgs(key));
+    }
+
     private void HandleTvKeys(object? sender, KeyEventArgs e)
     {
         if (e.KeyCode == Keys.F11) { ToggleFullscreen(); e.Handled = true; return; }
