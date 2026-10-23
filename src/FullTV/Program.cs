@@ -102,6 +102,7 @@ internal sealed class TvForm : Form
         root.Controls.Add(hero, 0, 1);
 
         var nav = new FlowLayoutPanel { Dock = DockStyle.Fill, WrapContents = true };
+        nav.Controls.Add(Button("▣ Android TV", (_, _) => AndroidRuntime.ShowManager(this), true));
         nav.Controls.Add(Button("＋ Install APK", async (_, _) => await InstallApkAsync(), true));
         nav.Controls.Add(Button("↻ Refresh apps", async (_, _) => await RefreshAppsAsync()));
         nav.Controls.Add(Button("◉ Connect ADB", async (_, _) => await ConnectAsync()));
