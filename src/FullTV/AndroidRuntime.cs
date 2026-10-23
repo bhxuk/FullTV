@@ -24,6 +24,16 @@ internal static class AndroidRuntime
         var state = new Label { AutoSize=false, Size=new System.Drawing.Size(590,50), Text=IsRunning?"Android running":IsConfigured?"Android disk configured":"Android disk not configured" };
         panel.Controls.Add(state);
         Button Make(string title, Action callback) { var b=new Button { Text=title, Width=360, Height=38, BackColor=System.Drawing.Color.FromArgb(55,59,94), ForeColor=System.Drawing.Color.White, FlatStyle=FlatStyle.Flat };b.Click+=(_,_)=>callback();panel.Controls.Add(b);return b; }
+        Make("Install and launch Android TV (official SDK)",()=>{
+            var script=Path.Combine(AppContext.BaseDirectory,"tools","setup-android-tv.ps1");
+            if(!File.Exists(script)) { MessageBox.Show(dialog,"The Android setup tool is missing from this install.","FullTV"); return; }
+            if(MessageBox.Show(dialog,"This downloads Android SDK tools and an Android TV system image from Google, which may require several GB of disk space and accepting Android SDK licence terms. Java 17+ and CPU virtualisation are required. Proceed?","Set up Android TV",MessageBoxButtons.YesNo,MessageBoxIcon.Question)!=DialogResult.Yes)return;
+            try {
+                var psi=new ProcessStartInfo("powershell.exe") { UseShellExecute=true };
+                psi.ArgumentList.Add("-NoProfile");psi.ArgumentList.Add("-ExecutionPolicy");psi.ArgumentList.Add("Bypass");psi.ArgumentList.Add("-NoExit");psi.ArgumentList.Add("-File");psi.ArgumentList.Add(script);
+                Process.Start(psi);
+            } catch(Exception ex) { MessageBox.Show(dialog,ex.Message,"Android setup failed"); }
+        });
         Make("Find Android TV ISO (LineageOS TV x86)",()=>{
             Process.Start(new ProcessStartInfo("https://github.com/LineageOS-TV-x86/x86_64_tv/releases") { UseShellExecute=true });
         });
