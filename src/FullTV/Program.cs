@@ -47,6 +47,8 @@ internal sealed class TvForm : Form
         http.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("FullTV", Application.ProductVersion.Split('+')[0]));
         Directory.CreateDirectory(settingsDir);
         LoadPreferences();
+        var sdkAdb = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FullTV", "AndroidSdk", "platform-tools", "adb.exe");
+        if (adbPath == "adb" && File.Exists(sdkAdb)) adbPath = sdkAdb;
         BuildUi();
         KeyDown += HandleTvKeys;
         gamepad = new GamepadNavigation(HandleControllerKey);
