@@ -1,0 +1,53 @@
+name: Windows build and release
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore src/FullTV/FullTV.csproj
+      - name: Build and publish self-contained
+        shell: pwsh
+        run: |
+          dotnet publish src/FullTV/FullTV.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+      - name: Set version
+        id: ver
+        shell: pwsh
+        run: |
+          if ("$env:GITHUB_REF" -match '^refs/tags/v(.+)$') { $v = $Matches[1] } else { $v = '0.1.0' }
+          "VERSION=$v" >> $env:GITHUB_OUTPUT
+      - name: Install Inno Setup
+        shell: pwsh
+        run: choco install innosetup -y --no-progress
+      - name: Create installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "/DMyAppVersion=${{ steps.ver.outputs.VERSION }}" "installer\FullTV.iss"
+      - name: Checksum
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts -Filter '*-Setup.exe' | ForEach-Object {
+            $sum = (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            "$sum  $($_.Name)" | Set-Content -Encoding ascii "$($_.FullName).sha256"
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FullTV-Windows-installer
+          path: artifacts/*
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          gh release create "${{ github.ref_name }}" artifacts/* --title "FullTV ${{ github.ref_name }}" --notes-file CHANGELOG.md --verify-tag
