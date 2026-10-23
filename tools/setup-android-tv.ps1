@@ -43,5 +43,5 @@ if (-not (Test-Path $avdIni)) {
 }
 if (-not (Test-Path $emulator)) { throw 'Android emulator executable missing after SDK installation.' }
 Step 'Launching Android TV...'
-Start-Process -FilePath $emulator -ArgumentList @('-avd',$AvdName,'-gpu','auto','-no-snapshot-save') -WorkingDirectory (Split-Path $emulator) -Environment @{ANDROID_AVD_HOME=$avdHome;ANDROID_HOME=$SdkRoot}
+Start-Process -FilePath $emulator -ArgumentList @('-avd',$AvdName,'-gpu','auto','-no-snapshot-save') -WorkingDirectory (Split-Path $emulator)
 Step 'Android TV launch requested. Leave this window open to review any errors.'
